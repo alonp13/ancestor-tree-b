@@ -45,11 +45,12 @@ class Tree
 {
 
 private:
-    Node *m_root;
+
     Node *findChild(Node *node, string name, search_type st);
     void remove(Node* node);
 
 public:
+    Node *m_root; // need to be private
     Tree(string name);
     Tree &addFather(string child, string father);
     Tree &addMother(string child, string mother);
@@ -57,6 +58,7 @@ public:
     string find(string relation);
     void display(Node *r);
     void display();
+    Node* findChild(Node *node, string tosearch);
     void remove(string name);
     
 };

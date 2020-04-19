@@ -32,12 +32,12 @@ string Node::getName()
 
 Node *Node::getFather()
 {
-    return this->m_father;
+    return m_father;
 }
 
 Node *Node::getMother()
 {
-    return this->m_mother;
+    return m_mother;
 }
 
 int Node::getLevel()
@@ -220,6 +220,7 @@ void Tree::display(Node *r)
     display(r->getFather());
     display(r->getMother());
 }
+
 void Tree::display()
 {
     display(m_root);
@@ -233,37 +234,77 @@ void Tree::remove(Node* node)
     {
         return;
     }
+    
     remove(node->getFather());
     remove(node->getMother());
 
     delete node;
-    node = NULL;
+}
 
-    if(node == NULL)
+
+Node *Tree::findChild(Node *node, string name)
+{
+    if(node != NULL)
     {
-        cout << "aa" <<endl;
+        if(node->getFather() != NULL)
+        {
+            if(node->getFather()->getName() == name)
+            {
+                return node;
+            }
+        }
+        if(node->getMother() != NULL)
+        {
+            if(node->getMother()->getName() == name)
+            {
+                return node;
+            }
+        }
+    } else {
+        return NULL;
     }
+
+    Node *father = findChild(node->getFather(), name);
+
+    if (father != NULL)
+    {
+        return father;
+    }
+
+    return findChild(node->getMother(), name);
 
 }
 
+
 void Tree::remove(string name)
 {
-    Node* child_found = findChild(m_root,name,BY_NAME);
-    cout << child_found->getName() << endl;
+    Node* child_found = findChild(m_root,name);
 
     if(child_found == NULL)
     {
         throw std::runtime_error("No such child!");
     }
 
-    if(child_found->getRelation() == "me")
+    if(m_root->getName() == name)
     {
         throw std::runtime_error("Cannot remove the root!");
     }
-    remove(child_found);
-  
+
+    if(child_found->getFather() != NULL && child_found->getFather()->getName() == name)
+    {
+        remove(child_found->getFather());
+        child_found->setFather(NULL);
+    }
+
+    if(child_found->getMother() != NULL && child_found->getMother()->getName() == name)
+    {
+        remove(child_found->getMother());
+        child_found->setMother(NULL);
+    }
 
 }
+
+
 
 // Node::~Node()
 // {
