@@ -3,6 +3,12 @@
 #include <stdexcept>
 using namespace std;
 
+typedef enum search_type
+{
+    BY_NAME,
+    BY_RELATION
+} search_type;
+
 typedef enum gender
 {
     MALE,
@@ -23,6 +29,7 @@ private:
 
 public:
     Node(string name);
+   // ~Node();
     void setFather(Node *father);
     void setMother(Node *mother);
     void setLevel(int level);
@@ -39,16 +46,18 @@ class Tree
 
 private:
     Node *m_root;
-    Node *findChild(Node *node, string name);
+    Node *findChild(Node *node, string name, search_type st);
+    void remove(Node* node);
 
 public:
     Tree(string name);
     Tree &addFather(string child, string father);
     Tree &addMother(string child, string mother);
     string relation(string name);
-    string find(string name);
+    string find(string relation);
     void display(Node *r);
     void display();
     void remove(string name);
+    
 };
 }; // namespace family

@@ -7,6 +7,7 @@ Node::Node(string name)
     m_name = name;
     m_father = NULL;
     m_mother = NULL;
+    m_level = 0;
 }
 
 void Node::setFather(Node *father)
@@ -62,9 +63,13 @@ void Node::setRelation(gender g, int level)
 
     case FEMALE:
         suffix = "mother";
-    default:
-        //exeption
+
+    case UNI:
         break;
+
+    default:
+        throw std::runtime_error("No such gender!");
+        
     }
 
     switch (level)
@@ -95,34 +100,53 @@ Tree::Tree(string name)
 {
     m_root = new Node(name);
     m_root->setLevel(0);
-    m_root->setRelation(UNI, 0);
+    m_root->setRelation(MALE, 0);
 }
 
-Node *Tree::findChild(Node *node, string name)
+Node *Tree::findChild(Node *node, string tosearch ,search_type st)
 {
     if (node == NULL)
     {
         return NULL;
     }
 
-    if (node->getName() == name)
+   // cout << node->getName() << endl;
+
+    switch (st)
     {
-        return node;
+    case BY_NAME:
+           if (node->getName() == tosearch)
+        {
+            return node;
+        }
+        break;
+
+    case BY_RELATION:
+
+        if (node->getRelation() == tosearch)
+        {
+            return node;
+        }
+        break;
+
+    default:
+       throw std::runtime_error("No search type!");
     }
 
-    Node *father = findChild(node->getFather(), name);
+
+    Node *father = findChild(node->getFather(), tosearch, st);
 
     if (father != NULL)
     {
         return father;
     }
 
-    return findChild(node->getMother(), name);
+    return findChild(node->getMother(), tosearch, st);
 }
 
 Tree &Tree::addFather(string child, string father)
 {
-    Node *child_found = findChild(m_root, child);
+    Node *child_found = findChild(m_root, child, BY_NAME);
 
     if (child_found == NULL)
     {
@@ -145,7 +169,7 @@ Tree &Tree::addFather(string child, string father)
 
 Tree &Tree::addMother(string child, string mother)
 {
-    Node *child_found = findChild(m_root, child);
+    Node *child_found = findChild(m_root, child, BY_NAME);
 
     if (child_found == NULL)
     {
@@ -168,23 +192,30 @@ Tree &Tree::addMother(string child, string mother)
 
 string Tree::relation(string name)
 {
-    Node *child_found = findChild(m_root, name);
+    Node *child_found = findChild(m_root, name, BY_NAME);
     if (child_found == NULL)
     {
-        return "unrelated";
+        return string("unrelated");
     }
     return child_found->getRelation();
 }
 
-string Tree::find(string name)
+string Tree::find(string relation)
 {
-    return "aa";
+    Node* child_found = findChild(m_root,relation,BY_RELATION);
+
+    if(child_found == NULL)
+    {
+        throw std::runtime_error("No such relation!");
+    }
+    return child_found->getName();
 }
 
 void Tree::display(Node *r)
 {
     if (r == NULL)
         return;
+    
     cout << r->getName() << "|" << r->getLevel() << "," << r->getRelation() << endl;
     display(r->getFather());
     display(r->getMother());
@@ -195,6 +226,49 @@ void Tree::display()
     cout << endl;
 }
 
+
+void Tree::remove(Node* node)
+{
+    if(node == NULL)
+    {
+        return;
+    }
+    remove(node->getFather());
+    remove(node->getMother());
+
+    delete node;
+    node = NULL;
+
+    if(node == NULL)
+    {
+        cout << "aa" <<endl;
+    }
+
+}
+
 void Tree::remove(string name)
 {
+    Node* child_found = findChild(m_root,name,BY_NAME);
+    cout << child_found->getName() << endl;
+
+    if(child_found == NULL)
+    {
+        throw std::runtime_error("No such child!");
+    }
+
+    if(child_found->getRelation() == "me")
+    {
+        throw std::runtime_error("Cannot remove the root!");
+    }
+    remove(child_found);
+  
+
 }
+
+// Node::~Node()
+// {
+//     delete[] &m_relation;
+//     delete[] &m_name;
+//     m_father = NULL;
+//     m_mother = NULL;
+// }
