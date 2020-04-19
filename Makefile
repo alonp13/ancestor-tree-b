@@ -7,10 +7,6 @@ HEADERS := $(wildcard *.h*)
 STUDENT_SOURCES := $(filter-out $(wildcard Test*.cpp), $(wildcard *.cpp))
 STUDENT_OBJECTS := $(subst .cpp,.o,$(STUDENT_SOURCES))
 
-
-demo: main.o FamilyTree.o
-	clang++-9 -std=c++2a main.o FamilyTree.o -o demo
-
 run: test
 	./$^
 
